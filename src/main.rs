@@ -25,7 +25,7 @@ pub struct Data {
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let boundaries_data = std::fs::read_to_string("map.geojson")?;
+    let boundaries_data = std::fs::read_to_string("data/map.geojson")?;
     let geojson = boundaries_data.parse::<geojson::GeoJson>()?;
     let collection: geo_types::GeometryCollection<f64> = geojson::quick_collection(&geojson)?;
 
@@ -34,7 +34,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         _ => panic!("Oh no"),
     };
 
-    let data: Data = serde_json::from_str(&std::fs::read_to_string("data.json")?)?;
+    let data: Data = serde_json::from_str(&std::fs::read_to_string("data/data.json")?)?;
 
     let mut data_elements: HashMap<i64, geo_types::Coordinate<f64>> = HashMap::new();
     let mut response = Vec::new();
@@ -78,7 +78,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("Total: {:?}km", total / 1000.0);
 
-    let file = std::fs::File::create("data-processed.json")?;
+    let file = std::fs::File::create("data/data-processed.json")?;
     serde_json::to_writer(file, &response)?;
 
     Ok(())
