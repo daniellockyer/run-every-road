@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
-    <link href='https://api.mapbox.com/mapbox.js/v3.3.1/mapbox.css' rel='stylesheet' />
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.0.0/mapbox-gl.css" rel="stylesheet" />
     <style>
         body {
             padding: 0;
@@ -22,16 +22,45 @@
 
 <body>
     <div id="map"></div>
-    <script src='https://api.mapbox.com/mapbox.js/v3.3.1/mapbox.js'></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.0.0/mapbox-gl.js"></script>
     <script>
-        L.mapbox.accessToken = 'pk.eyJ1IjoiZGFuaWVsbG9ja3llcjEiLCJhIjoiY2tpc3o5d3Y0Mmw3ZDJ5cWowbzJ5eWxodiJ9.WeeV9b4EHjZA179NWkdHqQ';
-        var map = new L.mapbox.map('map', 'mapbox.streets', {
-            center: [53.958257, -1.08],
-            zoom: 12
+        mapboxgl.accessToken = 'pk.eyJ1IjoiZGFuaWVsbG9ja3llcjEiLCJhIjoiY2tpc3o5d3Y0Mmw3ZDJ5cWowbzJ5eWxodiJ9.WeeV9b4EHjZA179NWkdHqQ';
+        var map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/light-v10',
+            center: [-1.08, 53.958257],
+            zoom: 11.4
         });
 
-        fetch("/data/data-processed.json").then(data => data.json()).then(body => {
-            L.polyline(body, {color: 'black', weight: 1, smooth: 0}).addTo(map);
+        function add(id, data, color) {
+            map.addSource(id, {
+                type: 'geojson',
+                data
+            });
+
+            map.addLayer({
+                id,
+                type: 'line',
+                source: id,
+                layout: {
+                    'line-join': 'round',
+                    'line-cap': 'round'
+                },
+                paint: {
+                    'line-color': color,
+                    'line-width': 1
+                }
+            });
+        }
+
+        map.on('load', function () {
+            fetch("/data/data-processed.json").then(data => data.json()).then(body => {
+                add('data-processed', body, 'black');
+            });
+
+            fetch("/data/activities.json").then(data => data.json()).then(body => {
+                add('activities', body, 'blue');
+            });
         });
     </script>
 </body>
