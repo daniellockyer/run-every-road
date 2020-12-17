@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "geojson-stream": "0.1.0",
+    "got": "11.8.1",
+    "through2": "4.0.2",
+    "through2-filter": "3.0.0"
+  }
+}
