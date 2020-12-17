@@ -1,7 +1,4 @@
-use geo::algorithm::contains::Contains;
-use geo::prelude::HaversineDistance;
-use geo_types::point;
-
+use geo::{algorithm::contains::Contains, point, prelude::HaversineDistance};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -27,16 +24,16 @@ pub struct Data {
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let boundaries_data = std::fs::read_to_string("data/map.geojson")?;
     let geojson = boundaries_data.parse::<geojson::GeoJson>()?;
-    let collection: geo_types::GeometryCollection<f64> = geojson::quick_collection(&geojson)?;
+    let collection: geo::GeometryCollection<f64> = geojson::quick_collection(&geojson)?;
 
     let boundaries = match &collection[0] {
-        geo_types::Geometry::Polygon(p) => p,
+        geo::Geometry::Polygon(p) => p,
         _ => panic!("Oh no"),
     };
 
     let data: Data = serde_json::from_str(&std::fs::read_to_string("data/data.json")?)?;
 
-    let mut data_elements: HashMap<i64, geo_types::Coordinate<f64>> = HashMap::new();
+    let mut data_elements: HashMap<i64, geo::Coordinate<f64>> = HashMap::new();
     let mut response = Vec::new();
 
     let mut total = 0.0;
@@ -44,7 +41,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     for element in data.elements {
         match element {
             DataElement::Node { id, lat, lon } => {
-                let coord = geo_types::Coordinate { x: lon, y: lat };
+                let coord = geo::Coordinate { x: lon, y: lat };
 
                 if !boundaries.contains(&coord) {
                     continue;

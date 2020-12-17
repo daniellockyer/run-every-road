@@ -196,7 +196,6 @@ name = "run-every-road"
 version = "0.1.0"
 dependencies = [
  "geo",
- "geo-types",
  "geojson",
  "serde",
  "serde_json",
