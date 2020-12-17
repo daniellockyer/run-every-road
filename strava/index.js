@@ -47,6 +47,9 @@ util.inherits(Source, Readable);
 new Source()
     .pipe(through2(function (chunk, enc, callback) {
         chunk.forEach(c => {
+            if (c.type !== 'Run') {
+                return;
+            }
             this.push(c.id);
         });
         callback();
