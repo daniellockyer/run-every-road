@@ -30,7 +30,7 @@
             zoom: 12
         });
 
-        fetch("/data-processed.json").then(data => data.json()).then(body => {
+        fetch("/data/data-processed.json").then(data => data.json()).then(body => {
             L.polyline(body, {color: 'black', weight: 1, smooth: 0}).addTo(map);
         });
     </script>
