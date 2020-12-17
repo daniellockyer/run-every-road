@@ -1,4 +1,4 @@
-use geo::{algorithm::contains::Contains, point, prelude::HaversineDistance};
+use geo::{algorithm::contains::Contains, line_string, prelude::HaversineLength};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -34,7 +34,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let data: Data = serde_json::from_str(&std::fs::read_to_string("data/data.json")?)?;
 
     let mut data_elements: HashMap<i64, geo::Coordinate<f64>> = HashMap::new();
-    let mut response = Vec::new();
+    let mut lines = Vec::new();
 
     let mut total = 0.0;
 
@@ -57,26 +57,36 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
                     let first_node = data_elements.get(&w[0]).unwrap();
                     let second_node = data_elements.get(&w[1]).unwrap();
-                    let mut i_response = Vec::new();
 
-                    let p1 = point!(x: first_node.x, y: first_node.y);
-                    let p2 = point!(x: second_node.x, y: second_node.y);
+                    let line = line_string![*first_node, *second_node];
+                    total += line.haversine_length();
 
-                    let distance = p1.haversine_distance(&p2);
-                    total += distance;
-
-                    i_response.push((first_node.y, first_node.x));
-                    i_response.push((second_node.y, second_node.x));
-                    response.push(i_response);
+                    lines.push(geo::Geometry::LineString(line));
                 }
             }
         }
     }
 
+    let feature_collection = geojson::FeatureCollection {
+        features: vec![geojson::Feature {
+            geometry: Some(geojson::Geometry {
+                value: geojson::Value::from(&geo::GeometryCollection(lines)),
+                bbox: None,
+                foreign_members: None,
+            }),
+            bbox: None,
+            id: None,
+            properties: None,
+            foreign_members: None,
+        }],
+        bbox: None,
+        foreign_members: None,
+    };
+
     println!("Total: {:?}km", total / 1000.0);
 
     let file = std::fs::File::create("data/data-processed.json")?;
-    serde_json::to_writer(file, &response)?;
+    serde_json::to_writer(file, &feature_collection)?;
 
     Ok(())
 }

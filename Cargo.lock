@@ -72,6 +72,7 @@ dependencies = [
  "num-traits",
  "robust",
  "rstar",
+ "serde",
 ]
 
 [[package]]
@@ -83,6 +84,7 @@ dependencies = [
  "approx",
  "num-traits",
  "rstar",
+ "serde",
 ]
 
 [[package]]
